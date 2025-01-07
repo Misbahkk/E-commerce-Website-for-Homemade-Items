@@ -1,0 +1,117 @@
+{% extends 'base/base.html' %}
+
+
+{% block start %}
+
+<div class="cart-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="cart-page-inner">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                            {% if cart and cart.cart_items.exists %}
+                              {% for cart_item in cart.cart_items.all %} 
+                                <tr>
+                                    <td>
+                                        <div class="img">
+                                            <a href="#"><img src="{{ cart_item.product.product_image.first.image.url }}" alt="Image"></a>
+                                            <p>{{ cart_item.product.name }}</p>
+                                        </div>
+                                    </td>
+                                    <td>${{ cart_item.product.price }}</td>
+                                    <td>
+                                        <div class="qty">
+                                            <button class="btn-minus"><i class="fa fa-minus"></i></button>
+                                            <input type="text" value="{{ cart_item.quantity }}">
+                                            <button class="btn-plus"><i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </td>
+                                    <td>${{ cart_item.get_product_price }}</td>
+                                    <td>
+                                        <form method="POST" action="{% url 'remove_cart' cart_item.uid %}">
+                                            {% csrf_token %}
+                                            <button type="submit"><i class="fa fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5">Your cart is empty!</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    
+                                    <td colspan="5">
+
+                                        <p class="text-center mt-4">Your cart is empty! Add products to see them here.</p>
+                                    </td>
+                                </tr>
+                        {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cart-page-inner">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% include "base/alert.html" %}
+                            <div class="coupon">
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                  
+                                    <input type="text" name="coupon" placeholder="Coupon Code">
+                                    <button type="submit">Apply Code</button>
+                                </form>
+                                {% if cart.coupon %}
+                                <a href="{% url 'removed_coupon' cart.uid %}" class="btn btn-success" style="background-color: green; color: white; border-color: green;">{{ cart.coupon.coupn_code }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if cart %}
+                        <div class="col-md-12">
+                            <div class="cart-summary">
+                                <div class="cart-content">
+                                    <h1>Cart Summary</h1>
+                                    <p>Sub Total<span>${{ cart.get_product_price }}</span></p>
+                                    <p>Shipping Cost<span>${{ shipping_cost }}</span></p>
+                                    <h2>Grand Total<span>${{ cart.get_cart_total }}</span></h2>
+                                </div>
+                                <div class="cart-btn">
+                                    <form method="POST" action="">
+                                        {% csrf_token %}
+                                        <button type="submit">Update Cart</button>
+                                    </form>
+                                    <a href="{% url 'checkout' %}">
+                                        <button>Checkout</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+<p>Your cart is empty!</p>
+{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+
+
+
+{% endblock  %}
+

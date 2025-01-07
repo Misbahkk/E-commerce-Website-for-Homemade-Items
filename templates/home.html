@@ -1,0 +1,15 @@
+<h1>All Products</h1>
+<div>
+    {% for product in products %}
+    <div>
+        <h2>{{ product.title }}</h2>
+        <p>{{ product.description }}</p>
+        <p>Price: ${{ product.price }}</p>
+        <p>Category: {{ product.category }}</p>
+        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width:200px;height:auto;">
+    </div>
+    <hr>
+    {% empty %}
+    <p>No products are available at the moment.</p>
+    {% endfor %}
+</div>
