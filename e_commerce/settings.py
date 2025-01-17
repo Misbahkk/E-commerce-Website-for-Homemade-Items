@@ -137,20 +137,24 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'public/static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  
 EMAIL_PORT = 587 
 EMAIL_USE_TLS = True  
 EMAIL_HOST_USER = 'misbahyousaf00@gmail.com'  
-EMAIL_HOST_PASSWORD = 'cvkx bslg zhzm axrk'  
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD_KEY')  
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 
 # Create your views here.
-JAZZCASH_MERCHANT_ID = "MC143920"
-JAZZCASH_PASSWORD = "73sb91dshv"
+JAZZCASH_MERCHANT_ID = os.getenv('JAZZCASH_MERCHANT_ID_KEY')
+JAZZCASH_PASSWORD = os.getenv("JAZZCASH_PASSWORD_KEY")
 JAZZCASH_RETURN_URL = "http://127.0.0.1:8000/success"
-JAZZCASH_INTEGRITY_SALT = "xz1y1ashz1"
+JAZZCASH_INTEGRITY_SALT = os.getenv('JAZZCASH_INTEGRITY_SALT_KEY')
