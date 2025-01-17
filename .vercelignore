@@ -5,5 +5,4 @@ base/__pycache__/
 account/__pycache__/
 siteApp/__pycache__/
 
-db.sqlite3
 e_commerce/.env
