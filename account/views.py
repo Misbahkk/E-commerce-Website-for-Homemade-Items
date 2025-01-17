@@ -5,11 +5,10 @@ from django.http import HttpResponseRedirect , HttpResponse
 from django.contrib.auth import authenticate,login,logout
 from .models import Profile ,userProfile
 from .forms import UserProfileForm
-from tkinter import E
-from cmath import log
+
 from siteApp.models import *
 from account.models import Cart, CartItems
-from django.conf import settings
+
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse

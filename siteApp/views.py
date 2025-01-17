@@ -1,8 +1,8 @@
 from django.shortcuts import render ,redirect
-from account.models import Cart, CartItems,Profile
+
 from siteApp.models import Product
-from django.http import Http404, HttpResponseRedirect
-from django.contrib import messages
+from django.http import Http404
+
 def get_product(request,slug):    
     try:
         products = Product.objects.get(slug=slug)
