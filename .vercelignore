@@ -1,0 +1,9 @@
+*.pyc
+e_commerce/__pycache__/
+home/__pycache__/
+base/__pycache__/
+account/__pycache__/
+siteApp/__pycache__/
+
+db.sqlite3
+e_commerce/.env
