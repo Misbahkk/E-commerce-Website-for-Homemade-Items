@@ -14,9 +14,7 @@ from pathlib import Path
 import os
 
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://e-commerce-website-for-homemade-production.up.railway.app/',
-]
+CSRF_TRUSTED_ORIGINS = ['https://e-commerce-website-for-homemade-production.up.railway.app']
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
