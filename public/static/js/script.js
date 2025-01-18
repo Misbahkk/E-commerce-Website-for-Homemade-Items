@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }).then((result) => {
         if (result.isConfirmed) {
             // Redirect to the logout URL
-            window.location.href = "logout/";
+            window.location.href = "account/logout/";
         }
     });
 }
