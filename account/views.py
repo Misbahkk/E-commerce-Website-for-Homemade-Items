@@ -79,7 +79,7 @@ def active_email(request,email_token):
         user = Profile.objects.get(email_token=email_token)
         user.is_email_varified=True
         user.save()
-        return redirect('/')
+        return redirect('/login/')
     except Exception as e:
         return HttpResponse('Invalid link')
     
