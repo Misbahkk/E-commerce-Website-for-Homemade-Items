@@ -44,9 +44,10 @@ def login_page(request):
     return render(request, 'accounts/login.html')
 
 def logout_user(request):
-    
-    logout(request)
-    return redirect('/')
+    # if request.method == "POST":
+        logout(request)
+        return redirect('/')
+    # return render(request, 'accounts/logout.html')
 
 
 def register_page(request):
