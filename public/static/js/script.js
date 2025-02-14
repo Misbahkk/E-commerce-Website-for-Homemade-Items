@@ -163,3 +163,49 @@ document.querySelectorAll("input").forEach((input) => {
       input.removeAttribute("readonly");
   });
 });
+
+// function incrementQuantity(cartItemId) {
+//   let quantityInput = document.querySelector(`#quantity-input-${cartItemId}`);
+//   quantityInput.value = parseInt(quantityInput.value) + 1;
+// }
+
+// function decrementQuantity(cartItemId) {
+//   let quantityInput = document.querySelector(`#quantity-input-${cartItemId}`);
+//   if (parseInt(quantityInput.value) > 1) {
+//       quantityInput.value = parseInt(quantityInput.value) - 1;
+//   }
+// }
+
+
+function updateQuantity(cartItemId, change) {
+  var quantityInput = $('#quantity-' + cartItemId);
+  var newQuantity = parseInt(quantityInput.val()) + change;
+
+  if (newQuantity < 1) {
+      alert('Quantity must be greater than 0.');
+      return;
+  }
+
+  $.ajax({
+      url: "{% url 'update_quantity' %}",
+      method: "POST",
+      data: {
+          'cart_item_id': cartItemId,
+          'quantity': newQuantity,
+          'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: function(response) {
+          if (response.status === 'success') {
+              quantityInput.val(newQuantity);
+              $('#total-price-' + cartItemId).text('$' + response.total_price);
+              $('#subtotal').text('$' + response.cart_total_price);
+              $('#grandtotal').text('$' + (response.cart_total_price));
+          } else {
+              alert(response.message);
+          }
+      },
+      error: function() {
+          alert('An error occurred while updating the quantity.');
+      }
+  });
+}

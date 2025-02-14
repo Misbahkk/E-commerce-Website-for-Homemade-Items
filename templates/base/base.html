@@ -44,14 +44,9 @@
                         <a href="{% url 'checkout' %}" class="nav-item nav-link">Checkout</a>
                         <a href="{% url 'my_account' %}" class="nav-item nav-link">My Account</a>
                         {% endif %}
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
-                            <div class="dropdown-menu">
-                                <a href="wishlist.html" class="dropdown-item">Wishlist</a>
-                                <a href="{% url 'login' %}" class="dropdown-item">Login & Register</a>
-                            </div>
-                        </div>
+                       
                         <a href="{% url 'contact_us' %}" class="nav-item nav-link">Contact Us</a>
+                        <a href="{% url 'login' %}" class="nav-item nav-link">Login & Register</a>
                     </div>
                     <div class="navbar-nav ml-auto">
                         <div class="nav-item dropdown">
@@ -89,10 +84,6 @@
                 </div>
                 <div class="col-md-3">
                     <div class="user">
-                        <a href="wishlist.html" class="btn wishlist">
-                            <i class="fa fa-heart"></i>
-                            <span>(0)</span>
-                        </a>
                         <a href="{% url 'cart' %}" class="btn cart">
                             <i class="fa fa-shopping-cart"></i>
                             <span>({{request.user.profile.get_cart_count}})</span>
@@ -229,6 +220,135 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
     <script src='/media/js/main.js'></script>
     <script src='/media/js/script.js'></script>
+   {% comment %} <script>
+    function updateQuantity(cartItemId, change) {
+      var quantityInput = $('#quantity-' + cartItemId);
+      var newQuantity = parseInt(quantityInput.val()) + change;
+    
+      if (newQuantity < 1) {
+          alert('Quantity must be greater than 0.');
+          return;
+      }
+    
+      $.ajax({
+          url: "{% url 'update_quantity' %}",
+          method: "POST",
+          data: {
+              'cart_item_id': cartItemId,
+              'quantity': newQuantity,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+              if (response.status === 'success') {
+                  quantityInput.val(newQuantity);
+                  $('#total-price-' + cartItemId).text('$' + response.total_price);
+                  $('#subtotal').text('$' + response.cart_total_price);
+                  $('#grandtotal').text('$' + (response.cart_total_price));
+              } else {
+                  alert(response.message);
+              }
+          },
+          error: function() {
+              alert('An error occurred while updating the quantity.');
+          }
+      });
+    }
+</script> {% endcomment %}
+
+
+{% comment %} <script>
+    function updateQuantity(cartItemId, change) {
+        console.log(cartItemId,change)
+
+        var quantityInput = $('#quantity-' + cartItemId);
+        console.log(quantityInput)
+        var currentQuantity = parseInt(quantityInput.val());
+        console.log(currentQuantity)
+        var newQuantity = currentQuantity + change;
+        console.log(newQuantity)
+
+
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            alert('Quantity must be greater than 0.');
+            console.log(newQuantity,newQuantity)
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'update_quantity' %}",
+            method: "POST",
+            data: {
+                'cart_item_id': cartItemId,
+                'quantity': newQuantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    quantityInput.val(newQuantity);
+                    $('#total-price-' + cartItemId).text('$' + response.total_price);
+                    $('#subtotal').text('$' + response.cart_total_price);
+                    $('#grandtotal').text('$' + response.cart_total_price);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function() {
+                alert('An error occurred while updating the quantity.');
+            }
+        });
+    }
+</script> {% endcomment %}
+
+
+<script>
+    function updateQuantity(cartItemId, productUid, change) {
+        var quantityInput;
+        if (cartItemId) {
+            quantityInput = $('#quantity-' + cartItemId);
+        } else if (productUid) {
+            quantityInput = $('#quantity-' + productUid);
+        } else {
+            alert('Invalid item.');
+            return;
+        }
+    
+        var currentQuantity = parseInt(quantityInput.val());
+        var newQuantity = currentQuantity + change;
+    
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            alert('Quantity must be greater than 0.');
+            return;
+        }
+    
+        $.ajax({
+            url: "{% url 'update_quantity' %}",
+            method: "POST",
+            data: {
+                'cart_item_id': cartItemId,
+                'product_uid': productUid,
+                'quantity': newQuantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    quantityInput.val(newQuantity);
+                    if (cartItemId) {
+                        $('#total-price-' + cartItemId).text('$' + response.total_price);
+                    } else if (productUid) {
+                        $('#total-price-' + productUid).text('$' + response.total_price);
+                    }
+                    $('#subtotal').text('$' + response.cart_total_price);
+                    $('#grandtotal').text('$' + response.cart_total_price);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function() {
+                alert('An error occurred while updating the quantity.');
+            }
+        });
+    }
+    </script>
 </body>
 </html>
 

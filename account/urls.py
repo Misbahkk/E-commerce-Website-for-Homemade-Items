@@ -1,6 +1,6 @@
 
 from django.urls import path
-from account.views import login_page,logout_user,register_page, active_email,cart,add_to_cart,remove_cart,remove_coupon,checkout,payment_success,dashboard,contactUs
+from account.views import login_page,update_quantity,logout_user,register_page, active_email,cart,add_to_cart,remove_cart,remove_coupon,checkout,payment_success,dashboard,contactUs
 
 
 urlpatterns = [
@@ -16,4 +16,5 @@ urlpatterns = [
     path('success/', payment_success, name='success'),
     path('',dashboard,name='my_account'),
     path('contactUs/',contactUs,name='contact_us'),
+    path('update-quantity/',update_quantity,name='update_quantity')
 ]

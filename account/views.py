@@ -1,10 +1,10 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect ,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect , HttpResponse
 from django.contrib.auth import authenticate,login,logout
 from .models import Profile ,userProfile
-from .forms import UserProfileForm
+from .forms import UserProfileForm,UpdateQuantityForm
 
 from siteApp.models import *
 from account.models import Cart, CartItems
@@ -100,17 +100,18 @@ def add_to_cart(request,uid):
             messages.error(request, "Product Alredy present in cart")
         else:
 
-            cart_item, created = CartItems.objects.get_or_create(cart = cart , product= products)
+            cart_item = CartItems.objects.get_or_create(cart = cart , product= products, quantity=1)
             messages.success(request, "Item added to cart successfully!")
-            if not created:
-                cart_item.quantity += 1
-                cart_item.save()
+          
     except Product.DoesNotExist:
         messages.error(request, "Product does not exist.")
     except Exception as e:
         print(e)
         messages.error(request, "Something went wrong. Please try again.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+
 
 
 def remove_cart(request,cart_item_uid):
@@ -121,6 +122,145 @@ def remove_cart(request,cart_item_uid):
         print(e)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+
+# def update_qantity(request):
+#     if  request.method == "POST":
+#         form = UpdateQuantityForm(request.POST)
+#         if form.is_valid():
+#             cart_item_id = form.cleaned_data['cart_item_id']
+#             new_quantity =  form.cleaned_data['quantity']
+
+#             cart_item =  get_object_or_404(CartItems,id=cart_item_id)
+#             cart_item.quantity = new_quantity
+#             cart_item.save()
+
+#             cart = cart_item.cart
+#             total_price = sum(item.get_total_price() for item in cart.cart_items.all())
+
+#             return render(request, 'product.html', {
+#                 'cart': cart,
+#                 'total_price': total_price,
+#                 'message': 'Quantity updated successfully!'
+#             })
+#     else:
+#         return HttpResponse("Invalid Request")
+from django.http import JsonResponse
+
+
+# @login_required
+# def update_quantity(request):
+#     if request.method == "POST" and request.is_ajax():
+#         cart_item_id = request.POST.get('cart_item_id')
+#         new_quantity = int(request.POST.get('quantity'))
+
+#         try:
+#             cart_item = get_object_or_404(CartItems, id=cart_item_id)
+#             if new_quantity <= 0:
+#                 return JsonResponse({'status': 'error', 'message': 'Quantity must be greater than 0.'})
+
+#             cart_item.quantity = new_quantity
+#             cart_item.save()
+
+#             total_price = cart_item.get_total_price()
+#             cart = cart_item.cart
+#             cart_total_price = cart.get_cart_total()
+
+#             return JsonResponse({
+#                 'status': 'success',
+#                 'message': 'Quantity updated successfully!',
+#                 'total_price': total_price,
+#                 'cart_total_price': cart_total_price
+#             })
+#         except CartItems.DoesNotExist:
+#             return JsonResponse({'status': 'error', 'message': 'Cart item does not exist.'})
+#     else:
+#         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+# @login_required
+# def update_quantity(request):
+#     if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#         cart_item_uid = request.POST.get('cart_item_id')
+#         product_uid = request.POST.get('product_uid')
+#         quantity_str = request.POST.get('quantity')
+
+#         # Ensure quantity is a valid integer
+#         try:
+#             new_quantity = int(quantity_str)
+#         except (ValueError, TypeError):
+#             return JsonResponse({'status': 'error', 'message': 'Invalid quantity value.'})
+
+#         try:
+#             cart_item = get_object_or_404(CartItems, uid=cart_item_uid)
+#             if new_quantity <= 0:
+#                 return JsonResponse({'status': 'error', 'message': 'Quantity must be greater than 0.'})
+
+#             cart_item.quantity = new_quantity
+#             cart_item.save()
+
+#             total_price = cart_item.get_total_price()
+#             cart = cart_item.cart
+#             cart_total_price = cart.get_cart_total()
+
+#             return JsonResponse({
+#                 'status': 'success',
+#                 'message': 'Quantity updated successfully!',
+#                 'total_price': total_price,
+#                 'cart_total_price': cart_total_price
+#             })
+#         except CartItems.DoesNotExist:
+#             return JsonResponse({'status': 'error', 'message': 'Cart item does not exist.'})
+#     else:
+#         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+@login_required
+def update_quantity(request):
+    if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        cart_item_id = request.POST.get('cart_item_id')
+        product_uid = request.POST.get('product_uid')
+        quantity_str = request.POST.get('quantity')
+
+        # Ensure quantity is a valid integer
+        try:
+            new_quantity = int(quantity_str)
+        except (ValueError, TypeError):
+            return JsonResponse({'status': 'error', 'message': 'Invalid quantity value.'})
+
+        try:
+            if cart_item_id:
+                # Update quantity for an existing cart item (cart.html)
+                cart_item = get_object_or_404(CartItems, uid=cart_item_id)
+            elif product_uid:
+                # Update quantity for a product (product.html)
+                product = Product.objects.get(uid=product_uid)
+                user = request.user
+                cart, _ = Cart.objects.get_or_create(user=user, is_paid=False)
+                cart_item, created = CartItems.objects.get_or_create(cart=cart, product=product)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No cart item or product specified.'})
+
+            if new_quantity <= 0:
+                return JsonResponse({'status': 'error', 'message': 'Quantity must be greater than 0.'})
+
+            cart_item.quantity = new_quantity
+            cart_item.save()
+
+            total_price = cart_item.get_total_price()
+            cart = cart_item.cart
+            cart_total_price = cart.get_cart_total()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Quantity updated successfully!',
+                'total_price': total_price,
+                'cart_total_price': cart_total_price
+            })
+        except Product.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Product does not exist.'})
+        except CartItems.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Cart item does not exist.'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
 @login_required
